@@ -1054,24 +1054,22 @@ contactForm.addEventListener("submit", async (event) => {
   formStatus.className = "form-status";
 
   try {
+    const payload = new FormData();
+    payload.append("name", name);
+    payload.append("email", email);
+    payload.append("shop", shop || "Nie podano");
+    payload.append("message", message);
+    payload.append("_replyto", email);
+    payload.append("_subject", `Zapytanie ze strony — ${shop || name}`);
+    payload.append("_template", "table");
+    payload.append("_captcha", "false");
+    payload.append("_honey", "");
+    payload.append("_url", window.location.href);
+
     const response = await fetch(CONTACT_ENDPOINT, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Accept": "application/json"
-      },
-      body: JSON.stringify({
-        name,
-        email,
-        shop: shop || "Nie podano",
-        message,
-        _replyto: email,
-        _subject: `Zapytanie ze strony — ${shop || name}`,
-        _template: "table",
-        _captcha: "false",
-        _honey: "",
-        _url: window.location.href
-      })
+      headers: { "Accept": "application/json" },
+      body: payload
     });
 
     const data = await response.json().catch(() => ({}));
