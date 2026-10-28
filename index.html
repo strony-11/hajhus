@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Asystent wędkarski — bot dla Twojego sklepu</title>
+  <meta name="description" content="Asystent na stronie sklepu wędkarskiego, który odpowiada o dostawie, zwrotach i doborze sprzętu. Sprawdź działające demo.">
+  <meta name="theme-color" content="#f5f2ea">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23173d33'/%3E%3Cpath d='M5 16c4.8-6 11-6 15 0-4 6-10.2 6-15 0Z' fill='none' stroke='%23f5f2ea' stroke-width='1.8'/%3E%3Cpath d='m20 16 5-3.5v7L20 16Z' fill='%23f5f2ea'/%3E%3Ccircle cx='10' cy='15' r='1' fill='%23f5f2ea'/%3E%3C/svg%3E">
+  <link rel="preload" href="assets/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/instrument-serif-italic-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="styles.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#demo">Przejdź do demo</a>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="#top" aria-label="Asystent wędkarski — początek strony">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M3 12c3.9-5.4 9.8-5.4 13.5 0-3.7 5.4-9.6 5.4-13.5 0Z" stroke="currentColor" stroke-width="1.7"/>
+            <path d="m16.5 12 4.5-3v6l-4.5-3Z" fill="currentColor"/>
+            <circle cx="7.7" cy="11.1" r=".9" fill="currentColor"/>
+          </svg>
+        </span>
+        <span class="brand-name">asystent <em>wędkarski</em></span>
+      </a>
+
+      <nav class="main-nav" aria-label="Główna nawigacja">
+        <a href="#demo">Demo</a>
+        <a href="#korzysci">Korzyści</a>
+        <a href="#cennik">Cennik</a>
+      </nav>
+
+      <a class="header-cta" href="#kontakt">
+        Napisz do mnie
+        <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="eyebrow-dot"></span> Asystent AI dla sklepów wędkarskich</p>
+        <h1 id="hero-title">
+          Asystent na Twojej stronie odpowiada klientom o dostawie, zwrotach i doborze sprzętu, <em>gdy Ty łowisz albo pakujesz paczki.</em>
+        </h1>
+        <p class="hero-lead">
+          Klient pyta o wędkę albo przesyłkę. Bot odpowiada od razu, a Ty nie przerywasz pracy. <strong>Demo obok działa naprawdę</strong> — zadaj pytanie jak klient.
+        </p>
+        <div class="hero-actions">
+          <a class="button button-primary" href="#demo" id="hero-demo-cta">
+            Przetestuj bota
+            <svg viewBox="0 0 18 18" fill="none" aria-hidden="true">
+              <path d="M3 9h12M10 4l5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+          <a class="button button-ghost" href="#cennik">Zobacz cennik</a>
+        </div>
+        <ul class="hero-facts" aria-label="Najważniejsze informacje">
+          <li>Wdrożenie w ok. 5 dni</li>
+          <li>Bez umowy na lata</li>
+          <li>Wycena w 24 h</li>
+        </ul>
+      </div>
+
+      <div class="demo-wrap" id="demo">
+        <div class="demo-topline">
+          <span class="live-label"><span class="live-dot"></span> Demo na żywo</span>
+          <span class="demo-store">przykładowy sklep: Wędka &amp; Woda</span>
+        </div>
+
+        <div class="demo-frame">
+          <div class="chat-card">
+            <header class="chat-head">
+              <div class="bot-avatar" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M3 12c3.9-5.4 9.8-5.4 13.5 0-3.7 5.4-9.6 5.4-13.5 0Z" stroke="currentColor" stroke-width="1.7"/>
+                  <path d="m16.5 12 4.5-3v6l-4.5-3Z" fill="currentColor"/>
+                  <circle cx="7.7" cy="11.1" r=".9" fill="currentColor"/>
+                </svg>
+                <span class="online-dot"></span>
+              </div>
+              <div class="chat-identity">
+                <strong>Asystent sklepu</strong>
+                <span>Wędka &amp; Woda · online</span>
+              </div>
+              <span class="chat-badge">24/7</span>
+            </header>
+
+            <div class="chat-log" id="chat-log" role="log" aria-live="polite" aria-label="Rozmowa z asystentem">
+              <div class="message bot">
+                <p>Cześć! Pomogę dobrać sprzęt, sprawdzić dostępność albo załatwić dostawę i zwrot. O co chodzi?</p>
+              </div>
+              <div class="typing" id="typing" hidden aria-label="Asystent pisze">
+                <span></span><span></span><span></span>
+              </div>
+            </div>
+
+            <div class="chat-suggestions" id="chat-suggestions" aria-label="Przykładowe pytania">
+              <button type="button" data-question="Jaką wędkę na szczupaka do 300 zł?">Wędka na szczupaka do 300 zł</button>
+              <button type="button" data-question="Ile trwa dostawa?">Ile trwa dostawa?</button>
+              <button type="button" data-question="Jak wygląda zwrot?">Jak wygląda zwrot?</button>
+              <button type="button" data-question="Macie kołowrotek do 200 zł?">Kołowrotek do 200 zł</button>
+            </div>
+
+            <form class="chat-form" id="chat-form" autocomplete="off">
+              <label class="sr-only" for="chat-input">Napisz pytanie do asystenta</label>
+              <input id="chat-input" name="message" type="text" maxlength="240" placeholder="Napisz pytanie…" autocomplete="off">
+              <button type="submit" aria-label="Wyślij wiadomość">
+                <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                  <path d="M4 10h11M11 5l5 5-5 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+            </form>
+          </div>
+        </div>
+        <p class="demo-caption">To przykładowy asystent. W Twoim sklepie odpowiada na Twoich produktach i zasadach.</p>
+      </div>
+    </section>
+
+    <section class="benefits" id="korzysci" aria-labelledby="benefits-title">
+      <div class="section-heading">
+        <p class="eyebrow"><span class="eyebrow-dot"></span> Co to zmienia</p>
+        <h2 id="benefits-title">Trzy rzeczy, które przestają zabierać Ci czas.</h2>
+      </div>
+
+      <div class="benefit-grid">
+        <article class="benefit-card">
+          <div class="benefit-top">
+            <span class="benefit-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M5 5.5h14v10H9l-4 3v-13Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+                <path d="M8.5 9h7M8.5 12h4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+              </svg>
+            </span>
+            <span class="benefit-number">01</span>
+          </div>
+          <h3>Mniej tych samych pytań</h3>
+          <p>Dostawa, zwroty, dostępność, dobór sprzętu. Bot odpowiada od razu, więc nie przerywasz pakowania, żeby napisać kolejny raz to samo.</p>
+        </article>
+
+        <article class="benefit-card">
+          <div class="benefit-top">
+            <span class="benefit-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.6"/>
+                <path d="M12 7.5V12l3 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+            <span class="benefit-number">02</span>
+          </div>
+          <h3>Odpowiada 24/7</h3>
+          <p>W niedzielę, po godzinach i w środku sezonu. Klient dostaje odpowiedź, gdy chce kupić, zamiast czekać do rana na maila.</p>
+        </article>
+
+        <article class="benefit-card">
+          <div class="benefit-top">
+            <span class="benefit-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M15 19a5 5 0 0 0-10 0" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                <circle cx="10" cy="9" r="3.5" stroke="currentColor" stroke-width="1.6"/>
+                <path d="M18 8v6M15 11h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+              </svg>
+            </span>
+            <span class="benefit-number">03</span>
+          </div>
+          <h3>Zbiera kontakty, które zwykle przepadają</h3>
+          <p>Gdy bot czegoś nie wie, prosi o e-mail i przekazuje pytanie dalej. Masz kontakt do klienta, zamiast pustej sesji bez zakupu.</p>
+        </article>
+      </div>
+
+      <div class="knowledge-note">
+        <span class="knowledge-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M12 3.8 19 7v5.2c0 4-2.9 6.8-7 8-4.1-1.2-7-4-7-8V7l7-3.2Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+            <path d="m9 12 2 2 4-4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        <p><strong>Zero wymyślania.</strong> Asystent odpowiada tylko z Twoich opisów, FAQ i zasad sklepu. Gdy czegoś nie wie, zbiera kontakt zamiast zgadywać.</p>
+      </div>
+    </section>
+
+    <section class="pricing" id="cennik" aria-labelledby="pricing-title">
+      <div class="pricing-inner">
+        <div class="pricing-copy">
+          <p class="eyebrow"><span class="eyebrow-dot"></span> Prosty cennik</p>
+          <h2 id="pricing-title">Wdrożenie i abonament. Bez zaskoczeń.</h2>
+          <p>Najpierw sprawdzam, ile pytań naprawdę obsłuży bot i czy to ma sens dla Twojego sklepu. Jeśli nie — powiem wprost.</p>
+          <div class="estimate-badge">
+            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M10 2.5 12.2 7l5 .7-3.6 3.5.9 5-4.5-2.4-4.5 2.4.9-5L2.8 7.7l5-.7L10 2.5Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+            </svg>
+            <span>Konkretna wycena w ciągu 24 godzin</span>
+          </div>
+          <p class="pricing-small">Masz większy sklep albo nietypowe pytania? Cena może się różnić — po to jest wycena.</p>
+        </div>
+
+        <article class="price-card">
+          <div class="price-main">
+            <p class="price-label">Wdrożenie</p>
+            <p class="price"><span>1 490</span> zł <small>jednorazowo</small></p>
+            <p class="price-description">Ustawiam asystenta na Twoich treściach i wpinam go na stronę.</p>
+            <ul class="checklist">
+              <li>Baza wiedzy z Twoich produktów i FAQ</li>
+              <li>Okno czatu i zbieranie kontaktów</li>
+              <li>Wdrożenie w ok. 5 dni roboczych</li>
+            </ul>
+          </div>
+          <div class="price-monthly">
+            <div>
+              <span class="monthly-label">Potem</span>
+              <strong>199 zł <span>/ mies.</span></strong>
+            </div>
+            <p>Hosting, poprawki treści i monitoring rozmów. Bez długiej umowy.</p>
+          </div>
+          <a class="button button-primary price-cta" href="#kontakt">
+            Chcę wycenę w 24 h
+            <svg viewBox="0 0 18 18" fill="none" aria-hidden="true">
+              <path d="M3 9h12M10 4l5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+        </article>
+      </div>
+    </section>
+
+    <section class="contact" id="kontakt" aria-labelledby="contact-title">
+      <div class="contact-inner">
+        <div class="contact-copy">
+          <p class="eyebrow"><span class="eyebrow-dot"></span> Kontakt</p>
+          <h2 id="contact-title">Pokaż mi swój sklep. Powiem, co bot może zdjąć Ci z głowy.</h2>
+          <p>Napisz, co najczęściej pytają klienci i ile czasu zajmuje Ci odpisywanie. Wrócę z konkretną propozycją, nie ofertą na 20 stron.</p>
+
+          <a class="contact-mail" href="mailto:czesc@asystentwedkarski.pl">
+            <span>
+              <span class="contact-mail-label">Albo od razu na maila</span>
+              czesc@asystentwedkarski.pl
+            </span>
+            <svg viewBox="0 0 18 18" fill="none" aria-hidden="true">
+              <path d="M3 9h12M10 4l5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+          <p class="reply-note"><span class="reply-dot"></span> Odpowiadam w ciągu doby.</p>
+        </div>
+
+        <form class="contact-form" id="contact-form" novalidate>
+          <div class="form-row">
+            <div class="field">
+              <label for="name">Imię</label>
+              <input id="name" name="name" type="text" autocomplete="name" placeholder="Marek" required>
+            </div>
+            <div class="field">
+              <label for="email">E-mail</label>
+              <input id="email" name="email" type="email" autocomplete="email" placeholder="marek@sklep.pl" required>
+            </div>
+          </div>
+          <div class="field">
+            <label for="shop">Adres sklepu <span>(opcjonalnie)</span></label>
+            <input id="shop" name="shop" type="text" autocomplete="url" placeholder="lowiskomarek.pl">
+          </div>
+          <div class="field">
+            <label for="message">Co najbardziej zabiera Ci czas?</label>
+            <textarea id="message" name="message" rows="4" placeholder="Np. codziennie dostaję po kilka pytań o dostawę i dobór wędki…" required></textarea>
+          </div>
+          <button class="button button-primary form-submit" type="submit">
+            Wyślij zapytanie
+            <svg viewBox="0 0 18 18" fill="none" aria-hidden="true">
+              <path d="M3 9h12M10 4l5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <p class="form-status" id="form-status" aria-live="polite">Odpowiadam w ciągu doby. Bez newslettera i sprzedażowych telefonów.</p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <a class="brand brand-footer" href="#top" aria-label="Asystent wędkarski — początek strony">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M3 12c3.9-5.4 9.8-5.4 13.5 0-3.7 5.4-9.6 5.4-13.5 0Z" stroke="currentColor" stroke-width="1.7"/>
+            <path d="m16.5 12 4.5-3v6l-4.5-3Z" fill="currentColor"/>
+            <circle cx="7.7" cy="11.1" r=".9" fill="currentColor"/>
+          </svg>
+        </span>
+        <span class="brand-name">asystent <em>wędkarski</em></span>
+      </a>
+      <p>Dla sklepów, w których klient chce wiedzieć, jaka wędka i kiedy paczka.</p>
+      <a href="mailto:czesc@asystentwedkarski.pl">czesc@asystentwedkarski.pl</a>
+    </div>
+  </footer>
+</body>
+</html>
