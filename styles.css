@@ -648,6 +648,37 @@ svg {
   background: #479467;
 }
 
+.message p .chat-line {
+  position: relative;
+  display: block;
+  margin-top: 6px;
+  padding-left: 12px;
+}
+
+.message p .chat-line::before {
+  position: absolute;
+  top: 0.62em;
+  left: 0;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #6b8d78;
+  content: "";
+}
+
+.message p .chat-total {
+  display: block;
+  margin-top: 9px;
+  padding-top: 7px;
+  border-top: 1px solid #dbe3d8;
+  color: #2d413a;
+  font-size: 12.5px;
+}
+
+.message p .chat-total strong {
+  color: var(--green);
+}
+
 .typing {
   display: flex;
   flex: 0 0 auto;
