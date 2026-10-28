@@ -183,11 +183,22 @@ const lineProducts = {
   }
 };
 
+const lurePicks = {
+  pike: { name: "Salmo Executor 10 cm", price: 69 },
+  perch: { name: "Relax Kopyto 2”", price: 19 },
+  zander: { name: "Relax Kopyto 4”", price: 32 },
+  carp: { name: "Kulki 15 mm", price: 24 },
+  bream: { name: "Pellet 4 mm", price: 16 },
+  trout: { name: "Robinson River 4 cm", price: 29 },
+  catfish: { name: "Guma 22 cm", price: 49 }
+};
+
 const state = {
   budget: null,
   species: null,
   category: null,
   lastProduct: null,
+  selected: { rod: null, reel: null, line: null },
   awaitingOrder: false,
   awaitingLead: false,
   messageCount: 0
@@ -291,7 +302,7 @@ function rodReply(speciesKey, budget) {
     suggestions: [
       { label: "Dobierz kołowrotek" },
       { label: isCoarseSpecies(speciesKey) ? "Jaka żyłka?" : "Jaka plecionka?" },
-      { label: "Sprawdź dostępność" },
+      { label: "Cały zestaw" },
       { label: "Ile trwa dostawa?" }
     ]
   };
@@ -314,6 +325,7 @@ function reelReply(budget) {
   state.category = "reel";
   state.budget = budget;
   state.lastProduct = product;
+  state.selected.reel = product;
 
   const intro = overBudget
     ? `Do ${formatPrice(budget)} zł nie ma kołowrotka, który chciałbym polecić bez zastrzeżeń. Najtańsza sensowna opcja to`
@@ -323,7 +335,7 @@ function reelReply(budget) {
     html: `${intro} <strong>${product.name}</strong> — <strong>${formatPrice(product.price)} zł</strong>. ${product.why[0].toUpperCase() + product.why.slice(1)}.<span class="chat-stock">Dostępne: ${product.stock} szt.</span><span class="chat-meta">Wielkość 2500 sprawdzi się przy lekkim i średnim spinie. Chcesz dobrać plecionkę?</span>`,
     suggestions: [
       { label: "Jaka plecionka?" },
-      { label: "Sprawdź dostępność" },
+      { label: "Cały zestaw" },
       { label: "Ile trwa dostawa?" }
     ]
   };
@@ -338,11 +350,119 @@ function lineReply() {
 
   state.category = "line";
   state.lastProduct = product;
+  state.selected.line = product;
 
   return {
     html: `Do tego zestawu dobrałbym <strong>${isCoarse ? "żyłkę" : "plecionkę"} ${product.name}</strong> — <strong>${formatPrice(product.price)} zł</strong>. ${description}<span class="chat-stock">Dostępne: ${product.stock} szt.</span><span class="chat-meta">${isCoarse ? "Do methody i klasycznego feederka to bezpieczny wybór." : "Do szczupaka i sandacza w zupełności wystarczy. Przy sumie poszedłbym w grubszą linkę."}</span>`,
     suggestions: [
+      { label: "Cały zestaw" },
       { label: "Dobierz kołowrotek" },
+      { label: "Ile trwa dostawa?" }
+    ]
+  };
+}
+
+function bundleReply(speciesKey, budget) {
+  const key = speciesKey || state.species;
+  const limit = budget || state.budget;
+
+  if (!key || !rods[key]) {
+    state.category = "bundle";
+    return {
+      html: "Zbiorę cały zestaw. Powiedz tylko, na jaką rybę — dobiorę kij, kołowrotek i linkę tak, żeby do siebie pasowały.",
+      suggestions: [
+        { label: "Zestaw na okonia do 300 zł" },
+        { label: "Zestaw na szczupaka do 500 zł" },
+        { label: "Zestaw na karpia do 600 zł" }
+      ]
+    };
+  }
+
+  const species = rods[key];
+  const rod = state.selected.rod || pickProduct(species.options, limit).product;
+  const reel = state.selected.reel || pickProduct(reels, limit).product;
+  const line = state.selected.line || (isCoarseSpecies(key) ? lineProducts.coarse : lineProducts.spinning);
+  const total = rod.price + reel.price + line.price;
+  const lineLabel = isCoarseSpecies(key) ? "Żyłka" : "Plecionka";
+
+  state.category = "bundle";
+  state.species = key;
+  state.lastProduct = reel;
+  state.selected = { rod, reel, line };
+
+  const items = [
+    `<span class="chat-line"><strong>Kij:</strong> ${rod.name} ${rod.length} / ${rod.cw} — ${formatPrice(rod.price)} zł</span>`,
+    `<span class="chat-line"><strong>Kołowrotek:</strong> ${reel.name} — ${formatPrice(reel.price)} zł</span>`,
+    `<span class="chat-line"><strong>${lineLabel}:</strong> ${line.name} — ${formatPrice(line.price)} zł</span>`
+  ].join("");
+
+  const budgetNote = !limit
+    ? "Ceny są łączne. Chcesz, żebym sprawdził dostępność?"
+    : total > limit
+      ? `Budżet ${formatPrice(limit)} zł nie wystarczy na całość. Czy ${formatPrice(limit)} zł dotyczy całego zestawu, czy jednej rzeczy?`
+      : `Całość mieści się w budżecie do ${formatPrice(limit)} zł.`;
+
+  return {
+    html: `Zestaw na ${species.label}:${items}<span class="chat-total">Razem: <strong>${formatPrice(total)} zł</strong></span><span class="chat-meta">${budgetNote}</span>`,
+    suggestions: [
+      { label: "Ile trwa dostawa?" },
+      { label: "Jakie są płatności?" },
+      { label: "Dobierz przynęty" }
+    ]
+  };
+}
+
+function multiReply({ key, budget, intents }) {
+  const points = [];
+  let total = 0;
+  let missingPrice = false;
+
+  if (intents.rod) {
+    if (key) {
+      const { product } = pickProduct(rods[key].options, budget);
+      state.selected.rod = product;
+      total += product.price;
+      points.push(`<span class="chat-line"><strong>Wędka:</strong> ${product.name} ${product.length} / ${product.cw} — ${formatPrice(product.price)} zł</span>`);
+    } else {
+      missingPrice = true;
+      points.push('<span class="chat-line"><strong>Wędka:</strong> podaj gatunek ryby, dobiorę długość i ciężar wyrzutu.</span>');
+    }
+  }
+
+  if (intents.reel) {
+    const { product } = pickProduct(reels, budget);
+    state.selected.reel = product;
+    total += product.price;
+    points.push(`<span class="chat-line"><strong>Kołowrotek:</strong> ${product.name} — ${formatPrice(product.price)} zł</span>`);
+  }
+
+  if (intents.line) {
+    const product = isCoarseSpecies(key) ? lineProducts.coarse : lineProducts.spinning;
+    state.selected.line = product;
+    total += product.price;
+    points.push(`<span class="chat-line"><strong>${isCoarseSpecies(key) ? "Żyłka" : "Plecionka"}:</strong> ${product.name} — ${formatPrice(product.price)} zł</span>`);
+  }
+
+  if (intents.lure) {
+    const lure = key ? lurePicks[key] : null;
+    if (lure) {
+      total += lure.price;
+      points.push(`<span class="chat-line"><strong>Przynęty:</strong> ${lure.name} — ${formatPrice(lure.price)} zł</span>`);
+    } else {
+      missingPrice = true;
+      points.push('<span class="chat-line"><strong>Przynęty:</strong> powiedz, na jaką rybę — szczupak, okoń czy karp.</span>');
+    }
+  }
+
+  const totalLabel = missingPrice ? "Razem sprzęt:" : "Razem:";
+  const totalHtml = total
+    ? `<span class="chat-total">${totalLabel} <strong>${formatPrice(total)} zł</strong></span>`
+    : "";
+
+  return {
+    html: `${key ? `Krótko na ${rods[key].label}:` : "Krótko, w jednym miejscu:"}${points.join("")}${totalHtml}<span class="chat-meta">Chcesz, żebym połączył to w cały zestaw?</span>`,
+    suggestions: [
+      { label: "Cały zestaw" },
       { label: "Ile trwa dostawa?" },
       { label: "Sprawdź dostępność" }
     ]
@@ -471,11 +591,13 @@ function setSuggestions(items) {
   });
 }
 
-function scrollChat() {
+function scrollChat(immediate = false) {
   window.requestAnimationFrame(() => {
-    chatLog.scrollTo({
-      top: chatLog.scrollHeight,
-      behavior: reducedMotion ? "auto" : "smooth"
+    window.requestAnimationFrame(() => {
+      chatLog.scrollTo({
+        top: chatLog.scrollHeight,
+        behavior: reducedMotion || immediate ? "auto" : "smooth"
+      });
     });
   });
 }
@@ -511,6 +633,13 @@ function replyFor(text) {
   const normalized = normalize(text);
   const budget = extractBudget(normalized);
   const speciesKey = findSpecies(normalized);
+  const speciesChanged = Boolean(speciesKey && speciesKey !== state.species);
+  const budgetChanged = Boolean(budget && budget !== state.budget);
+
+  if (speciesChanged || budgetChanged) {
+    state.selected = { rod: null, reel: null, line: null };
+  }
+
   if (speciesKey) state.species = speciesKey;
   if (budget) state.budget = budget;
 
@@ -541,6 +670,10 @@ function replyFor(text) {
   const isMethod = hasAny(normalized, ["koszyk", "method"]);
   const isMarine = hasAny(normalized, ["rekin", "marlin", "tunczyk", "tunczyka", "zarlacz"]);
   const isServiceQuestion = hasAny(normalized, ["wdrozenie", "abonament", "cena bota", "ile kosztuje bot", "twoj bot"]);
+  const isBundle = hasAny(normalized, ["caly zestaw", "pelny zestaw", "wszystko naraz", "zestaw na"])
+    || /\bkomplet\b/.test(normalized)
+    || /\b(ile razem|ile lacznie|jaki koszt zestawu|koszt calosci)\b/.test(normalized);
+  const productIntentCount = [isRod, isReel, isLine, isLure].filter(Boolean).length;
 
   if (state.awaitingLead) {
     if (/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(text.trim())) {
@@ -652,6 +785,10 @@ function replyFor(text) {
     return orderStatusReply(directOrderMatch[1]);
   }
 
+  if (isBundle) {
+    return bundleReply(speciesKey, budget);
+  }
+
   if (isStock && !isRod && !isReel && !isLine && !isLure && !isGroundbait) {
     const product = explicitProduct || state.lastProduct;
     if (product) {
@@ -683,6 +820,10 @@ function replyFor(text) {
         { label: "Wędka na szczupaka do 300 zł" }
       ]
     };
+  }
+
+  if (productIntentCount >= 2) {
+    return multiReply({ key: state.species, budget: budget || state.budget, intents: { rod: isRod, reel: isReel, line: isLine, lure: isLure } });
   }
 
   if (isReel) {
@@ -775,7 +916,7 @@ function replyFor(text) {
 
   state.awaitingLead = true;
   return {
-    html: "Tego nie mam w przykładowej bazie. W prawdziwym sklepie poprosiłbym Cię o e-mail i przekazał pytanie właścicielowi, zamiast je zgubić.<span class=\"chat-meta\">Możesz wpisać e-mail tutaj — to demo, więc nic nie wyślę.</span>",
+    html: "Tego nie ma w przykładowej bazie. W prawdziwym sklepie nie zgaduję — ceny i dostępność sprawdzam w feedzie XML/CSV, a gdy czegoś tam brakuje, proszę o e-mail i przekazuję pytanie właścicielowi.<span class=\"chat-meta\">Możesz wpisać e-mail tutaj — to demo, więc nic nie wyślę.</span>",
     suggestions: [
       { label: "Wróć do przykładowych pytań" }
     ]
@@ -825,6 +966,7 @@ async function sendMessage(rawText) {
   addMessage("bot", reply.html, true);
   setSuggestions(reply.suggestions || DEFAULT_SUGGESTIONS);
   setTyping(false);
+  scrollChat(true);
   state.messageCount += 1;
 
   if (window.innerWidth > 960) {
