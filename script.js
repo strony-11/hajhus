@@ -1,4 +1,6 @@
-const CONTACT_EMAIL = "czesc@asystentwedkarski.pl";
+const CONTACT_EMAIL = "hajhus.bussines@gmail.com";
+const CONTACT_ENDPOINT = `https://formsubmit.co/ajax/${CONTACT_EMAIL}`;
+const DEFAULT_FORM_STATUS = "Wiadomość trafi prosto na mój e-mail. Odpowiadam w ciągu doby, bez newslettera i sprzedażowych telefonów.";
 
 const chatLog = document.getElementById("chat-log");
 const chatForm = document.getElementById("chat-form");
@@ -582,7 +584,7 @@ function replyFor(text) {
 
   if (isServiceQuestion) {
     return {
-      html: "To pytanie o samo wdrożenie, a nie o produkt ze sklepu. Wdrożenie kosztuje <strong>1 490 zł</strong>, potem <strong>199 zł/mies.</strong> Szczegóły znajdziesz w sekcji <a href=\"#cennik\">Cennik</a> — wycenę robię w 24 h.",
+      html: "To pytanie o samo wdrożenie, a nie o produkt ze sklepu. Wdrożenie kosztuje <strong>1 490 zł</strong>, potem <strong>299 zł/mies.</strong> Szczegóły znajdziesz w sekcji <a href=\"#cennik\">Cennik</a> — wycenę robię w 24 h.",
       suggestions: [
         { label: "Ile trwa dostawa?" },
         { label: "Wędka na szczupaka do 300 zł" }
@@ -849,6 +851,7 @@ document.getElementById("hero-demo-cta").addEventListener("click", () => {
 
 const contactForm = document.getElementById("contact-form");
 const formStatus = document.getElementById("form-status");
+const formSubmit = contactForm.querySelector('button[type="submit"]');
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 function setFieldError(field, hasError) {
@@ -857,16 +860,24 @@ function setFieldError(field, hasError) {
   field.querySelector("input, textarea")?.setAttribute("aria-invalid", String(hasError));
 }
 
+if (new URLSearchParams(window.location.search).get("wyslano") === "1") {
+  formStatus.textContent = "Dzięki! Zapytanie trafiło na moją skrzynkę. Odpowiem w ciągu doby.";
+  formStatus.className = "form-status success";
+  const cleanUrl = new URL(window.location.href);
+  cleanUrl.searchParams.delete("wyslano");
+  window.history.replaceState({}, "", `${cleanUrl.pathname}${cleanUrl.search}${cleanUrl.hash}`);
+}
+
 contactForm.addEventListener("input", (event) => {
   const field = event.target.closest(".field");
   if (field) setFieldError(field, false);
   if (formStatus.classList.contains("error")) {
-    formStatus.textContent = "Odpowiadam w ciągu doby. Bez newslettera i sprzedażowych telefonów.";
+    formStatus.textContent = DEFAULT_FORM_STATUS;
     formStatus.className = "form-status";
   }
 });
 
-contactForm.addEventListener("submit", (event) => {
+contactForm.addEventListener("submit", async (event) => {
   event.preventDefault();
 
   const nameField = document.getElementById("name");
@@ -894,16 +905,46 @@ contactForm.addEventListener("submit", (event) => {
     return;
   }
 
-  const subject = `Zapytanie ze strony — ${shop || name}`;
-  const body = [
-    `Imię: ${name}`,
-    `E-mail: ${email}`,
-    shop ? `Sklep: ${shop}` : null,
-    "",
-    message
-  ].filter(Boolean).join("\n");
+  const originalButton = formSubmit.innerHTML;
+  formSubmit.disabled = true;
+  formSubmit.textContent = "Wysyłam…";
+  formStatus.textContent = "Wysyłam zapytanie…";
+  formStatus.className = "form-status";
 
-  formStatus.textContent = `Otworzyłem Twój program pocztowy. Jeśli się nie otworzył, napisz na ${CONTACT_EMAIL}.`;
-  formStatus.className = "form-status success";
-  window.location.href = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  try {
+    const response = await fetch(CONTACT_ENDPOINT, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      body: JSON.stringify({
+        name,
+        email,
+        shop: shop || "Nie podano",
+        message,
+        _replyto: email,
+        _subject: `Zapytanie ze strony — ${shop || name}`,
+        _template: "table",
+        _captcha: "false",
+        _honey: "",
+        _url: window.location.href
+      })
+    });
+
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok || data.success === "false") {
+      throw new Error(data.message || "Nie udało się wysłać formularza.");
+    }
+
+    contactForm.reset();
+    formStatus.textContent = "Dzięki! Zapytanie trafiło na moją skrzynkę. Odpowiem w ciągu doby.";
+    formStatus.className = "form-status success";
+  } catch (error) {
+    formStatus.innerHTML = `Nie udało się wysłać formularza. Napisz bezpośrednio na <a href="mailto:${CONTACT_EMAIL}">${CONTACT_EMAIL}</a>.`;
+    formStatus.className = "form-status error";
+  } finally {
+    formSubmit.disabled = false;
+    formSubmit.innerHTML = originalButton;
+  }
 });
