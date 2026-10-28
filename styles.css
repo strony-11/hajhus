@@ -1260,6 +1260,12 @@ svg {
   margin-top: 3px;
 }
 
+.form-submit:disabled {
+  cursor: wait;
+  opacity: 0.72;
+  transform: none;
+}
+
 .form-status {
   min-height: 17px;
   margin: 12px 0 0;
@@ -1275,6 +1281,11 @@ svg {
 
 .form-status.error {
   color: #a34e36;
+}
+
+.form-status a {
+  color: inherit;
+  text-underline-offset: 2px;
 }
 
 .site-footer {
