@@ -12,9 +12,9 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
 
 const DEFAULT_SUGGESTIONS = [
   { label: "Wędka na szczupaka do 300 zł", question: "Jaką wędkę na szczupaka do 300 zł?" },
-  { label: "Ile trwa dostawa?", question: "Ile trwa dostawa?" },
-  { label: "Jak wygląda zwrot?", question: "Jak wygląda zwrot?" },
-  { label: "Kołowrotek do 200 zł", question: "Macie kołowrotek do 200 zł?" }
+  { label: "Zestaw dla początkującego", question: "Jaki zestaw dla początkującego?" },
+  { label: "Plecionka czy żyłka?", question: "Plecionka czy żyłka?" },
+  { label: "Ile trwa dostawa?", question: "Ile trwa dostawa?" }
 ];
 
 const rods = {
@@ -193,12 +193,211 @@ const lurePicks = {
   catfish: { name: "Guma 22 cm", price: 49 }
 };
 
+const knowledgeTopics = [
+  {
+    id: "beginner",
+    terms: ["zestaw dla poczatkujacego", "pierwszy zestaw", "pierwsza wedka", "od czego zaczac", "poczatkujacy"],
+    replies: [
+      "Na start nie kupuj najtaniej. Najprostszy sensowny zestaw: <strong>Mikado Sensei 2,10 m</strong> (219 zł), <strong>Daiwa Sweepfire 2500</strong> (169 zł) i <strong>Dragon Invisible 0,10 mm</strong> (89 zł) — razem <strong>477 zł</strong>. Do tego kilka gum 5–8 cm i główki 3–5 g. Chcesz, żebym dobrał przynęty pod okonia?",
+      "Zacznij od lekkiego spinu na okonia: kij 2,10 m do 15 g, kołowrotek 2500 i cienka plecionka. Z tego, co mamy, wychodzi <strong>477 zł</strong> za kij, kołowrotek i linkę. Na start wystarczą 3–4 gumy, nie cała kolekcja woblerów."
+    ],
+    suggestions: [
+      { label: "Przynęty na okonia" },
+      { label: "Plecionka czy żyłka?" },
+      { label: "Ile trwa dostawa?" }
+    ]
+  },
+  {
+    id: "line-compare",
+    terms: ["plecionka czy zylka", "zylka czy plecionka", "plecionka a zylka", "roznica plecionka", "co lepsze plecionka", "kiedy plecionka"],
+    replies: [
+      "Plecionka jest czulsza i mniej się rozciąga — lepsza do spinningu i kontaktu z gumą. Żyłka więcej wybacza, jest tańsza i lepiej pasuje do feederka oraz karpiówki. Do szczupaka i sandacza brałbym plecionkę, do methody żyłkę.",
+      "Krótko: drapieżnik i spinning — plecionka. Feeder, karp i spokojne łowienie — żyłka. Plecionka daje czucie przynęty, żyłka lepiej tonie i mniej kosztuje przy częstych zaczepach."
+    ],
+    suggestions: [
+      { label: "Jaka plecionka?" },
+      { label: "Jaka żyłka?" },
+      { label: "Ile trwa dostawa?" }
+    ]
+  },
+  {
+    id: "feeder-start",
+    terms: ["feeder na poczatek", "zestaw feeder", "kij feeder", "wedka feeder", "jak zaczac feeder"],
+    replies: [
+      "Na początek feeder 3,00–3,30 m do 90 g, kołowrotek 3000–4000 z wolnym biegiem i żyłka 0,22 mm. Z naszej półki: <strong>Mikado Ultraviolet Feeder 279 zł</strong> + <strong>Okuma Ceymar 249 zł</strong> + <strong>Dragon VHS 39 zł</strong>. Do tego koszyk 30 g i pellet 4 mm.",
+      "Feeder na start nie musi być drogi: kij do 90 g, kołowrotek 3000–4000 i żyłka 0,22. Nasz zestaw z Mikado Ultraviolet, Okumą i Dragonem VHS wychodzi <strong>567 zł</strong>. Przynęty i koszyk dobierzesz później pod wodę."
+    ],
+    suggestions: [
+      { label: "Zestaw na leszcza do 600 zł" },
+      { label: "Dobierz koszyk method" },
+      { label: "Ile trwa dostawa?" }
+    ]
+  },
+  {
+    id: "method-guide",
+    terms: ["jak lowic na method", "method feeder", "metoda method", "zestaw method", "methoda"],
+    replies: [
+      "Method to prosty zestaw: koszyk 30–45 g, krótki przypon 10 cm, haczyk 10–12 i pellet 4–6 mm. Kij feeder do 90 g, żyłka 0,22–0,25. Zacznij od 30 g i zwiększaj, jeśli wiatr przeszkadza.",
+      "Do methody nie potrzebujesz ciężkiej karpiówki. Wystarczy feeder do 90 g, koszyk 30 g, przypon 10 cm i haczyk 10–12. Na start pellet 4 mm, a później możesz przejść na kulki 6–8 mm."
+    ],
+    suggestions: [
+      { label: "Dobierz koszyk method" },
+      { label: "Przynęty na karpia" },
+      { label: "Wędka na karpia do 300 zł" }
+    ]
+  },
+  {
+    id: "float-guide",
+    terms: ["splawik", "splawika", "metoda splawikowa", "lowienie na splawik", "bat", "tyczka"],
+    replies: [
+      "Na jezioro do spławika: kij 4–5 m, żyłka 0,16–0,18, spławik 2–4 g i haczyk 12–14. Przy wietrze bierz cięższy spławik, żeby stabilniej stał w wodzie.",
+      "Spławik dobierasz do warunków: 1–2 g na ciszę, 3–4 g przy fali. Żyłka 0,16–0,18, haczyk 12–14 i delikatna zanęta. Na rzece zwiększ ciężar i skróć przypon."
+    ],
+    suggestions: [
+      { label: "Wędka na leszcza do 300 zł" },
+      { label: "Jakie są płatności?" },
+      { label: "Ile trwa dostawa?" }
+    ]
+  },
+  {
+    id: "hooks",
+    terms: ["haczyk", "haki", "przypon", "rozmiar haczyka"],
+    replies: [
+      "Do methody i feedera: haczyk 10–12 i przypon 10 cm. Na okonia i pstrąga: 6–10. Na szczupaka nie zakładaj zwykłego haczyka bez zabezpieczenia — potrzebny przypon wolframowy 20–30 cm i hak 2–4.",
+      "Rozmiar haczyka zależy od przynęty: pellet 4 mm — hak 12, kukurydza — 10–12, guma 10 cm — 2–4 z długim trzonkiem. Do szczupaka zawsze przypon stalowy albo wolframowy."
+    ],
+    suggestions: [
+      { label: "Jaka plecionka?" },
+      { label: "Przynęty na szczupaka" },
+      { label: "Ile trwa dostawa?" }
+    ]
+  },
+  {
+    id: "free-shipping",
+    terms: ["darmowa dostawa", "dostawa jest darmowa", "dostawa gratis", "od ilu dostawa", "prog darmowej", "kiedy gratis", "darmow"],
+    replies: [
+      "Dostawa jest gratis od <strong>299 zł</strong>. Poniżej: paczkomat 13,99 zł, kurier 16,99 zł. Przy zestawie dla początkującego za 477 zł wysyłka wychodzi już free.",
+      "Próg darmowej dostawy to <strong>299 zł</strong>. Liczy się wartość produktów po rabatach. Poniżej progu paczkomat kosztuje 13,99 zł, a kurier 16,99 zł."
+    ],
+    suggestions: [
+      { label: "Ile trwa dostawa?" },
+      { label: "Jakie są płatności?" },
+      { label: "Zestaw dla początkującego" }
+    ]
+  },
+  {
+    id: "pickup",
+    terms: ["odbior osobisty", "odebrac osobiscie", "odbior w sklepie", "przyjsc do sklepu", "stacjonarnie"],
+    replies: [
+      "Możesz odebrać osobiście w Poznaniu, ul. Rybacka 12, pon.–pt. 9–18 i sob. 9–14. Zamówienie przygotuję zwykle w ciągu kilku godzin — w demo nie ma prawdziwego koszyka, więc to tylko scenariusz.",
+      "Odbiór osobisty działa w godz. 9–18 w tygodniu i 9–14 w sobotę. Najlepiej napisz wcześniej, co bierzesz, żebym odłożył sprzęt i nie jechał po niego na magazyn."
+    ],
+    suggestions: [
+      { label: "Godziny otwarcia" },
+      { label: "Jak zamówić?" },
+      { label: "Ile trwa dostawa?" }
+    ]
+  },
+  {
+    id: "abroad",
+    terms: ["zagranic", "za granice", "wysylka do niemiec", "wysylka do czech", "wysylka do slowacji", "anglia", "irlandia"],
+    replies: [
+      "Wysyłka za granicę jest możliwa, ale koszt zależy od kraju i wagi. W prawdziwym sklepie bot policzyłby ją z cennika kuriera, a nie strzelał kwotą. Napisz kraj — powiem, co trzeba sprawdzić.",
+      "Za granicę wysyłamy po indywidualnej wycenie. Największe ryzyko to koszt transportu przy długich kijach. Podaj kraj i kod pocztowy, a w realnym sklepie przygotuję konkretną opcję."
+    ],
+    suggestions: [
+      { label: "Jakie są płatności?" },
+      { label: "Jak zamówić?" },
+      { label: "Ile trwa dostawa?" }
+    ]
+  },
+  {
+    id: "invoice",
+    terms: ["faktura", "fakture", "faktury", "nip", "faktura vat"],
+    replies: [
+      "Fakturę VAT wystawiamy elektronicznie. Potrzebuję NIP i nazwy firmy — najlepiej podać je przy składaniu zamówienia. W demo nie zbieram prawdziwych danych, tylko pokazuję flow.",
+      "Do faktury wystarczy NIP i nazwa firmy podane w koszyku. Dokument przyjdzie mailem razem z potwierdzeniem zamówienia. Jeśli potrzebujesz konkretnego terminu płatności, zaznacz to w uwagach."
+    ],
+    suggestions: [
+      { label: "Jakie są płatności?" },
+      { label: "Jak zamówić?" },
+      { label: "Ile trwa dostawa?" }
+    ]
+  },
+  {
+    id: "cancel",
+    terms: ["anulowac", "anuluj", "odwolac zamowienie", "zmienic adres", "zmiana adresu", "zmienic zamowienie", "zmienic rozmiar"],
+    replies: [
+      "Zamówienie da się zmienić albo anulować, dopóki nie wyjdzie z magazynu. Napisz numer zamówienia i co chcesz zmienić — najlepiej od razu, bo paczki wychodzą do 13:00. W demo numer możesz wpisać, ale nic nie zmienię.",
+      "Najszybciej zadziała anulowanie przed nadaniem paczki. Podaj numer WW i nowy adres albo decyzję o anulowaniu. Po wysyłce zostaje już zwrot albo przekierowanie u kuriera."
+    ],
+    suggestions: [
+      { label: "Jak wygląda zwrot?" },
+      { label: "Ile trwa dostawa?" },
+      { label: "Kontakt do sklepu" }
+    ]
+  },
+  {
+    id: "promo",
+    terms: ["promocj", "rabat", "wyprzeda", "kupon", "kod rabat", "taniej", "b2b", "hurt"],
+    replies: [
+      "Nie obiecuję rabatu, którego nie ma w systemie. W prawdziwym sklepie sprawdziłbym aktywne promocje i próg rabatu hurtowego w feedzie. Jeśli chcesz, zostaw zapytanie o konkretny zestaw.",
+      "Przy jednym zestawie rabat zwykle nie ma sensu — lepiej dobrać dobrze sprzęt. Przy większych zamówieniach B2B w realnym sklepie bot sprawdziłby progi rabatowe zamiast wymyślać zniżkę."
+    ],
+    suggestions: [
+      { label: "Czy dostawa jest darmowa?" },
+      { label: "Zestaw dla początkującego" },
+      { label: "Jak zamówić?" }
+    ]
+  },
+  {
+    id: "gift",
+    terms: ["karta podarunkowa", "karty podarunkowe", "kart podarunkow", "podarunkow", "bon", "voucher", "prezent"],
+    replies: [
+      "Karta podarunkowa to dobry prezent, gdy nie wiesz, jaki kij wybrać. W demo nie ma modułu bonów, ale w sklepie wystawiłbym kod o wartości 200, 300 albo 500 zł z ważnością 12 miesięcy.",
+      "Bon podarunkowy najlepiej sprawdza się przy sprzęcie, bo obdarowany sam dobierze długość i ciężar wyrzutu. W realnym sklepie wysyłka bonu byłaby natychmiastowa na e-mail."
+    ],
+    suggestions: [
+      { label: "Zestaw dla początkującego" },
+      { label: "Jakie są płatności?" },
+      { label: "Ile trwa dostawa?" }
+    ]
+  },
+  {
+    id: "order-how",
+    terms: ["jak zamowic", "jak zlozyc zamowienie", "jak kupic", "proces zamowienia", "czy moge zamowic"],
+    replies: [
+      "Wybierasz produkt, dodajesz do koszyka, podajesz adres i płatność. Zamówienia do 13:00 wysyłamy tego samego dnia. Jeśli nie wiesz, co wybrać, powiedz, na jaką rybę i jaki budżet — dobiorę zestaw.",
+      "Zakup jest prosty: produkt do koszyka, dane dostawy, płatność i gotowe. Potwierdzenie dostaniesz mailem. Możesz też najpierw zapytać mnie o dobór sprzętu, żeby nie kupować dwa razy."
+    ],
+    suggestions: [
+      { label: "Ile trwa dostawa?" },
+      { label: "Jakie są płatności?" },
+      { label: "Jak wygląda zwrot?" }
+    ]
+  },
+  {
+    id: "min-order",
+    terms: ["minimalne zamowienie", "minimalna kwota", "od jakiej kwoty", "minimalna wartosc"],
+    replies: [
+      "Nie mamy minimum zamówienia — możesz kupić nawet jedną paczkę gum. Darmowa dostawa zaczyna się od 299 zł, ale poniżej też wyślemy, tylko z opłatą 13,99 albo 16,99 zł.",
+      "Możesz zamówić jedną przynętę. Przy kwocie poniżej 299 zł doliczamy koszt dostawy: 13,99 zł paczkomat albo 16,99 zł kurier."
+    ],
+    suggestions: [
+      { label: "Czy dostawa jest darmowa?" },
+      { label: "Jakie są płatności?" },
+      { label: "Ile trwa dostawa?" }
+    ]
+  }
+];
+
 const state = {
   budget: null,
   species: null,
   category: null,
   lastProduct: null,
   selected: { rod: null, reel: null, line: null },
+  variants: Object.create(null),
   awaitingOrder: false,
   awaitingLead: false,
   messageCount: 0
@@ -250,6 +449,12 @@ function extractBudget(text) {
 
 function formatPrice(value) {
   return value.toLocaleString("pl-PL");
+}
+
+function pickVariant(key, variants) {
+  const count = state.variants[key] || 0;
+  state.variants[key] = count + 1;
+  return variants[count % variants.length];
 }
 
 function pickProduct(options, budget) {
@@ -674,12 +879,16 @@ function replyFor(text) {
     || /\bkomplet\b/.test(normalized)
     || /\b(ile razem|ile lacznie|jaki koszt zestawu|koszt calosci)\b/.test(normalized);
   const productIntentCount = [isRod, isReel, isLine, isLure].filter(Boolean).length;
+  const topic = knowledgeTopics.find((entry) => hasAny(normalized, entry.terms));
 
   if (state.awaitingLead) {
     if (/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(text.trim())) {
       state.awaitingLead = false;
       return {
-        html: "Dzięki! W realnym wdrożeniu ten e-mail trafiłby do sklepu razem z pytaniem. To demo, więc nic nie wysłałem — możesz testować dalej.",
+        html: pickVariant("lead-thanks", [
+          "Dzięki! W realnym wdrożeniu ten e-mail trafiłby do sklepu razem z pytaniem. To demo, więc nic nie wysłałem — możesz testować dalej.",
+          "Zapisane na potrzeby demo. W prawdziwym sklepie przekazałbym pytanie właścicielowi razem z Twoim adresem. Możesz sprawdzić kolejny temat."
+        ]),
         suggestions: DEFAULT_SUGGESTIONS
       };
     }
@@ -695,7 +904,11 @@ function replyFor(text) {
 
   if (hasAny(normalized, ["dzieki", "dziekuje", "super", "spoko", "do widzenia", "pa pa"]) && normalized.length < 40) {
     return {
-      html: "Nie ma sprawy. Jak coś jeszcze — jestem tutaj.",
+      html: pickVariant("thanks", [
+        "Nie ma sprawy. Jak coś jeszcze — jestem tutaj.",
+        "Dobrze, że pytasz. Jeśli chcesz, mogę jeszcze sprawdzić dostawę albo dobrać linkę.",
+        "Jasne. Wracaj, gdy będziesz potrzebować konkretnego modelu."
+      ]),
       suggestions: [
         { label: "Ile trwa dostawa?" },
         { label: "Jak wygląda zwrot?" },
@@ -717,7 +930,10 @@ function replyFor(text) {
 
   if (isServiceQuestion) {
     return {
-      html: "To pytanie o samo wdrożenie, a nie o produkt ze sklepu. Wdrożenie kosztuje <strong>1 490 zł</strong>, potem <strong>299 zł/mies.</strong> Szczegóły znajdziesz w sekcji <a href=\"#cennik\">Cennik</a> — wycenę robię w 24 h.",
+      html: pickVariant("service", [
+        "To pytanie o samo wdrożenie, a nie o produkt ze sklepu. Wdrożenie kosztuje <strong>1 490 zł</strong>, potem <strong>299 zł/mies.</strong> Szczegóły znajdziesz w sekcji <a href=\"#cennik\">Cennik</a> — wycenę robię w 24 h.",
+        "Wdrożenie asystenta to <strong>1 490 zł</strong> jednorazowo i <strong>299 zł/mies.</strong> za hosting, monitoring i poprawki. Jeśli chcesz, sprawdź sekcję <a href=\"#cennik\">Cennik</a> albo wyślij zapytanie z formularza."
+      ]),
       suggestions: [
         { label: "Ile trwa dostawa?" },
         { label: "Wędka na szczupaka do 300 zł" }
@@ -725,9 +941,20 @@ function replyFor(text) {
     };
   }
 
+  if (topic) {
+    return {
+      html: pickVariant(`topic:${topic.id}`, topic.replies),
+      suggestions: topic.suggestions
+    };
+  }
+
   if (isReturn) {
     return {
-      html: "Masz <strong>30 dni</strong> na zwrot. Produkt musi być nieużywany, z metkami i w oryginalnym opakowaniu. Wystarczy formularz zwrotu na stronie — wygenerujesz etykietę za 12,99 zł, a przy wymianie jest gratis. Zwrot księgujemy do 3 dni roboczych.<span class=\"chat-meta\">Pieniądze wracają tą samą metodą płatności, którą zapłaciłeś.</span>",
+      html: pickVariant("return", [
+        "Masz <strong>30 dni</strong> na zwrot. Produkt musi być nieużywany, z metkami i w oryginalnym opakowaniu. Wystarczy formularz zwrotu na stronie — wygenerujesz etykietę za 12,99 zł, a przy wymianie jest gratis. Zwrot księgujemy do 3 dni roboczych.<span class=\"chat-meta\">Pieniądze wracają tą samą metodą płatności, którą zapłaciłeś.</span>",
+        "Zwrot masz przez <strong>30 dni</strong>, ale sprzęt nie może być używany i musi mieć metki oraz oryginalne opakowanie. Formularz zwrotu wygeneruje etykietę za 12,99 zł, a przy wymianie na inny rozmiar jest bezpłatna.",
+        "Najprościej: wypełnij formularz zwrotu, wydrukuj etykietę i odeślij paczkę. Mamy <strong>3 dni robocze</strong> na księgowanie zwrotu po sprawdzeniu produktu. Przy wymianie nie płacisz za etykietę."
+      ]),
       suggestions: [
         { label: "Ile trwa dostawa?" },
         { label: "Jakie są płatności?" },
@@ -738,7 +965,10 @@ function replyFor(text) {
 
   if (isWarranty) {
     return {
-      html: "Sprzęt ma <strong>2 lata gwarancji</strong>. Przy usterce opisz sprawę w formularzu reklamacji — jeśli wada jest fabryczna, naprawa albo wymiana jest bezpłatna. Przynęty i gumy rozpatrujemy indywidualnie.",
+      html: pickVariant("warranty", [
+        "Sprzęt ma <strong>2 lata gwarancji</strong>. Przy usterce opisz sprawę w formularzu reklamacji — jeśli wada jest fabryczna, naprawa albo wymiana jest bezpłatna. Przynęty i gumy rozpatrujemy indywidualnie.",
+        "Reklamację przyjmujemy przez formularz. Potrzebuję numeru zamówienia, opisu usterki i zdjęcia. Gwarancja obejmuje <strong>2 lata</strong> na sprzęt; zużyte przynęty oceniamy osobno, bez obiecywania z góry."
+      ]),
       suggestions: [
         { label: "Jak wygląda zwrot?" },
         { label: "Ile trwa dostawa?" },
@@ -749,7 +979,10 @@ function replyFor(text) {
 
   if (isPayment) {
     return {
-      html: "Płacisz <strong>BLIK-iem, kartą, Przelewy24</strong> albo przy odbiorze (dopłata 5 zł). Przy zamówieniach od 500 zł dostępne są raty 0%.",
+      html: pickVariant("payment", [
+        "Płacisz <strong>BLIK-iem, kartą, Przelewy24</strong> albo przy odbiorze (dopłata 5 zł). Przy zamówieniach od 500 zł dostępne są raty 0%.",
+        "Najszybko: BLIK albo karta. Możesz też wybrać Przelewy24, a przy odbiorze dopłacasz 5 zł. Raty 0% włączamy od 500 zł."
+      ]),
       suggestions: [
         { label: "Ile trwa dostawa?" },
         { label: "Jak wygląda zwrot?" },
@@ -760,7 +993,10 @@ function replyFor(text) {
 
   if (isHours) {
     return {
-      html: "Sklep online działa całą dobę, a ja odpowiadam od razu. Właściciel odpisuje <strong>pon.–pt. 9–18</strong> i <strong>sob. 9–14</strong>. Sklep stacjonarny: ul. Rybacka 12, Poznań.",
+      html: pickVariant("hours", [
+        "Sklep online działa całą dobę, a ja odpowiadam od razu. Właściciel odpisuje <strong>pon.–pt. 9–18</strong> i <strong>sob. 9–14</strong>. Sklep stacjonarny: ul. Rybacka 12, Poznań.",
+        "Online możesz zamawiać o każdej porze. Telefon i wiadomości obsługuję <strong>pon.–pt. 9–18</strong>, w sobotę <strong>9–14</strong>. Stacjonarnie zapraszam na ul. Rybacką 12 w Poznaniu."
+      ]),
       suggestions: [
         { label: "Ile trwa dostawa?" },
         { label: "Jakie są płatności?" },
@@ -813,7 +1049,11 @@ function replyFor(text) {
 
   if (isDelivery) {
     return {
-      html: "Zamówienia złożone <strong>do 13:00</strong> wysyłamy tego samego dnia. Paczkomat to <strong>13,99 zł</strong>, kurier <strong>16,99 zł</strong>, a od 299 zł dostawa jest gratis. Zwykle masz paczkę u siebie w <strong>1–2 dni robocze</strong>.<span class=\"chat-meta\">Numer śledzenia dostaniesz mailem po nadaniu.</span>",
+      html: pickVariant("delivery", [
+        "Zamówienia złożone <strong>do 13:00</strong> wysyłamy tego samego dnia. Paczkomat to <strong>13,99 zł</strong>, kurier <strong>16,99 zł</strong>, a od 299 zł dostawa jest gratis. Zwykle masz paczkę u siebie w <strong>1–2 dni robocze</strong>.<span class=\"chat-meta\">Numer śledzenia dostaniesz mailem po nadaniu.</span>",
+        "Paczki wychodzą w dni robocze do 13:00. Paczkomat kosztuje 13,99 zł, kurier 16,99 zł, a od <strong>299 zł</strong> dostawa jest darmowa. Na adres zwykle dociera w <strong>1–2 dni robocze</strong>.",
+        "Najczęściej wybierany jest paczkomat — 13,99 zł i zwykle następnego dnia. Kurier to 16,99 zł. Jeśli zamówisz rano, wysyłka może ruszyć jeszcze tego samego dnia."
+      ]),
       suggestions: [
         { label: "Jak wygląda zwrot?" },
         { label: "Jakie są płatności?" },
@@ -909,14 +1149,21 @@ function replyFor(text) {
 
   if (/^(czesc|hej|hello|witam|dzien dobry|dobry wieczor|siema|yo)\b/.test(normalized) && normalized.length < 34) {
     return {
-      html: "Cześć! W czym pomóc — dobrać sprzęt, sprawdzić dostawę albo ogarnąć zwrot?",
+      html: pickVariant("greeting", [
+        "Cześć! W czym pomóc — dobrać sprzęt, sprawdzić dostawę albo ogarnąć zwrot?",
+        "Hej. Powiedz, na jaką rybę łowisz i jaki masz budżet, a dobiorę zestaw bez zgadywania.",
+        "Dzień dobry. Mogę pomóc w doborze kija, kołowrotka, linki, przynęt albo w sprawach zamówienia."
+      ]),
       suggestions: DEFAULT_SUGGESTIONS
     };
   }
 
   state.awaitingLead = true;
   return {
-    html: "Tego nie ma w przykładowej bazie. W prawdziwym sklepie nie zgaduję — ceny i dostępność sprawdzam w feedzie XML/CSV, a gdy czegoś tam brakuje, proszę o e-mail i przekazuję pytanie właścicielowi.<span class=\"chat-meta\">Możesz wpisać e-mail tutaj — to demo, więc nic nie wyślę.</span>",
+    html: pickVariant("fallback", [
+      "Tego nie ma w przykładowej bazie. W prawdziwym sklepie nie zgaduję — ceny i dostępność sprawdzam w feedzie XML/CSV, a gdy czegoś tam brakuje, proszę o e-mail i przekazuję pytanie właścicielowi.<span class=\"chat-meta\">Możesz wpisać e-mail tutaj — to demo, więc nic nie wyślę.</span>",
+      "Nie chcę strzelać odpowiedzią. W realnym wdrożeniu sprawdziłbym feed produktowy i FAQ, a jeśli nadal brakowałoby danych, zapisałbym pytanie wraz z Twoim e-mailem.<span class=\"chat-meta\">Wpisz e-mail w demo albo zapytaj o inny temat.</span>"
+    ]),
     suggestions: [
       { label: "Wróć do przykładowych pytań" }
     ]
